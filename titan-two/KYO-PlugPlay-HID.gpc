@@ -1,0 +1,270 @@
+#pragma METAINFO("Journey to Kyoto Plug&Play PS4/5", 1, 10, "ZeusII")
+
+// Allows to control Japanese Rail Sim: Journey to Kyoto with your Densha de GO! Plug&Play Controller
+
+// your Plug&Play unit must be upgraded to 1.13 release
+// HID hack must be installed https://github.com/GMMan/dengo-plug-and-play-controller
+// Start your Plug&Play right arrow pressed until the conection led in Titan Two device lights on (Port A)
+// On the game settings, enable advanced controls + analog pressure -non-step mode- otherwise, the levers will not work
+// If using on PS5, remember to connect a third party USB controller on Port B to prevent recurrent disconnects every few minutes
+
+// Game Settings:
+// - Control scheme: A
+// - Stick mode: Keep
+// - Ebrake: Off (not enough levers to use eBrake!)
+
+// Game Controls:
+// Press SELECT to enable (blue led) or disable the levers (red led), this is required in order to move through the menus
+// Horn pressing Square and Circle (electric horn)
+// Change view via Triangle
+// Pause as Options Button
+// Cross is kept as confirm to avoid having to toggle game/menu mode during routes
+
+// changelist
+// 1.00 - first release
+
+#include <remapper.gph>
+
+const uint8 DenshaDeGo[43] = {
+    RMP_USB_A,
+    BUTTON_1,  BUTTON_2,  BUTTON_4,  BUTTON_3,  BUTTON_5,  BUTTON_6,  BUTTON_18, 
+    BUTTON_8,  BUTTON_9,  BUTTON_10, BUTTON_11, BUTTON_12, BUTTON_13, BUTTON_14, 
+    BUTTON_15, BUTTON_17, BUTTON_16, BUTTON_7, BUTTON_19, BUTTON_20, BUTTON_21, 
+    STICK_1_X, STICK_1_Y, ACCEL_2_X, ACCEL_2_Y, 
+    POINT_1_X, POINT_1_Y, POINT_2_X, POINT_2_Y, 
+    ACCEL_1_X, ACCEL_1_Y, ACCEL_1_Z, STICK_2_X, STICK_2_Y, ACCEL_2_Z, 
+    GYRO_1_X,  GYRO_1_Y,  GYRO_1_Z,
+    PADDLE_1,  PADDLE_2,  PADDLE_3,  PADDLE_4
+};
+
+int8 LAST_STICK_1_X = 0;
+int8 LAST_STICK_1_Y = 0;
+int8 LAST_STICK_2_X = 0;
+int8 LAST_STICK_2_Y = 0;
+
+bool GAME = FALSE;
+
+init {
+    remapper(DenshaDeGo);
+	LED(0.0, 0.0, 0.0, 5.0); // Blue
+}
+
+void LED(fix32 a, fix32 b, fix32 c, fix32 d)
+{
+    led_set(LED_1, a, 0);
+    led_set(LED_2, b, 0);
+    led_set(LED_3, c, 0);
+    led_set(LED_4, d, 0);
+}
+
+main {
+		
+	//Game Mode toggle - Square
+	if (get_val(BUTTON_18) && !get_val(BUTTON_14) && !get_val(BUTTON_15) && !get_val(BUTTON_16)  && !get_val(BUTTON_17) ) {
+		set_val(BUTTON_18, 0);
+		if (GAME == FALSE) { 
+			//Enter Game Mode
+			GAME = TRUE;
+			LED(0.0, 5.0, 0.0, 0.0); // Red
+		}
+		else {
+			//Enter Menu Mode
+			GAME = FALSE;
+			LED(0.0, 0.0, 0.0, 5.0); // Blue
+		}
+	}
+	
+	// Digital pad
+	if (get_val(BUTTON_14) && get_val(BUTTON_18))	{
+		//UP
+		set_val(BUTTON_14,0);
+		set_val(BUTTON_18,0);
+		set_val(BUTTON_10, 100);
+		
+	}
+	else if (get_val(BUTTON_16) && get_val(BUTTON_18))	{
+		//DOWN
+		set_val(BUTTON_16,0);
+		set_val(BUTTON_18,0);
+		set_val(BUTTON_11, 100);
+	}
+	else if (get_val(BUTTON_17) && get_val(BUTTON_18))	{
+		// LEFT
+		set_val(BUTTON_17,0);
+		set_val(BUTTON_18,0);
+		set_val(BUTTON_12, 100);
+	}
+	if (get_val(BUTTON_15) && get_val(BUTTON_18))	{
+		// RIGHT
+		set_val(BUTTON_15,0);
+		set_val(BUTTON_18,0);
+		set_val(BUTTON_13, 100);
+	}
+	
+	// Levers only work after enabling Game Mode by pressing Square
+	if(GAME == TRUE)
+	{
+				
+		//Normal Honk - Cross
+		if (get_val(BUTTON_17)) {
+			set_val(BUTTON_17,0);
+			set_val(BUTTON_4, 100);
+		}
+		//Electric Honk - Circle
+		if (get_val(BUTTON_15)) {
+			set_val(BUTTON_15,0);
+			set_val(BUTTON_5, 100);
+		}
+		
+		//Change View - Triangle
+		if (get_val(BUTTON_14)) {
+			set_val(BUTTON_14,0);
+			set_val(BUTTON_7, 100);
+		}
+		
+		// Accel and Brake Levers
+		if (get_val(ACCEL_2_X) > 50.0 && get_val(ACCEL_2_Y) > -10.0) { // brake intermediate
+			set_val(STICK_1_X, LAST_STICK_1_X);
+			set_val(STICK_1_Y, LAST_STICK_1_Y);
+			set_val(STICK_2_X, LAST_STICK_2_X);
+			set_val(STICK_2_Y, LAST_STICK_2_Y);
+		}
+		else if (get_val(ACCEL_2_X) > 43.0 && get_val(ACCEL_2_X) <= 50.0 && get_val(ACCEL_2_Y) > -10.0) {  // EB
+			LAST_STICK_1_X = 100;
+			LAST_STICK_1_Y = -30;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, 100);
+			set_val(STICK_1_Y, -30);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}
+		else if (get_val(ACCEL_2_X) > 38.0 && get_val(ACCEL_2_X) <= 43.0 && get_val(ACCEL_2_Y) > -10.0) { // B7+B8 as the game only has 7 brake notches
+			LAST_STICK_1_X = 100;
+			LAST_STICK_1_Y = 50;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, 100);
+			set_val(STICK_1_Y, 50);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}
+		else if (get_val(ACCEL_2_X) > 35.0 && get_val(ACCEL_2_X) <= 38.0 && get_val(ACCEL_2_Y) > -10.0) { // B6
+			LAST_STICK_1_X = 60;
+			LAST_STICK_1_Y = 90;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, 60);
+			set_val(STICK_1_Y, 90);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}	
+		else if (get_val(ACCEL_2_X) > 30.0 && get_val(ACCEL_2_X) <= 35.0 && get_val(ACCEL_2_Y) > -10.0) { // B5
+			LAST_STICK_1_X = 20;
+			LAST_STICK_1_Y = 100;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, 20);
+			set_val(STICK_1_Y, 100);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}
+		else if (get_val(ACCEL_2_X) > 25.0 && get_val(ACCEL_2_X) <= 30.0 && get_val(ACCEL_2_Y) > -10.0) { // B4
+			LAST_STICK_1_X = -40;
+			LAST_STICK_1_Y = 100;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, -40);
+			set_val(STICK_1_Y, 100);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}
+		else if (get_val(ACCEL_2_X) > 18.0 && get_val(ACCEL_2_X) <= 25.0 && get_val(ACCEL_2_Y) > -10.0) { // B3
+			LAST_STICK_1_X = -70;
+			LAST_STICK_1_Y = 85;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, -70);
+			set_val(STICK_1_Y, 85);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}
+		else if (get_val(ACCEL_2_X) > 10.0 && get_val(ACCEL_2_X) <= 18.0 && get_val(ACCEL_2_Y) > -10.0) { // B2
+			LAST_STICK_1_X = -90;
+			LAST_STICK_1_Y = 65;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, -90);
+			set_val(STICK_1_Y, 65);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}
+		else if (get_val(ACCEL_2_X) > 0.0 && get_val(ACCEL_2_X) <= 10.0 && get_val(ACCEL_2_Y) > -10.0) { // B1
+			LAST_STICK_1_X = -100;
+			LAST_STICK_1_Y = 45;
+			LAST_STICK_2_X = 0;
+			LAST_STICK_2_Y = -100;
+			set_val(STICK_1_X, -100);
+			set_val(STICK_1_Y, 45);
+			set_val(STICK_2_X, 0);
+			set_val(STICK_2_Y, -100);
+		}
+		else if (get_val(ACCEL_2_X) <= 0.0 && get_val(ACCEL_2_Y) >= -10.0 && get_val(ACCEL_2_Y) < 1.18) { // B0+P0
+			LAST_STICK_1_X = -100;
+			LAST_STICK_1_Y = 0;
+			LAST_STICK_2_X = 75;
+			LAST_STICK_2_Y = -85;
+			set_val(STICK_1_X, -100);
+			set_val(STICK_1_Y, 0);
+			set_val(STICK_2_X, 75);
+			set_val(STICK_2_Y, -85);
+		}
+		else if (get_val(ACCEL_2_X) <= 0.0 && get_val(ACCEL_2_Y) >= -20.0 && get_val(ACCEL_2_Y) < -10.0) { // P1
+			LAST_STICK_1_X = -100;
+			LAST_STICK_1_Y = 0;
+			LAST_STICK_2_X = 100;
+			LAST_STICK_2_Y = -35;
+			set_val(STICK_1_X, -100);
+			set_val(STICK_1_Y, 0);
+			set_val(STICK_2_X, 100); 
+			set_val(STICK_2_Y, -35); 
+		}
+		else if (get_val(ACCEL_2_X) <= 0.0 && get_val(ACCEL_2_Y) >= -40.0 && get_val(ACCEL_2_Y) < -20.0) { // P2
+			LAST_STICK_1_X = -100;
+			LAST_STICK_1_Y = 0;
+			LAST_STICK_2_X = 100;
+			LAST_STICK_2_Y = 30;
+			set_val(STICK_1_X, -100);
+			set_val(STICK_1_Y, 0);
+			set_val(STICK_2_X, 100); 
+			set_val(STICK_2_Y, 30);
+		} 
+		else if (get_val(ACCEL_2_X) <= 0.0 && get_val(ACCEL_2_Y) >= -60.0 && get_val(ACCEL_2_Y) < -40.0) { // P3
+			LAST_STICK_1_X = -100;
+			LAST_STICK_1_Y = 0;
+			LAST_STICK_2_X = 80;
+			LAST_STICK_2_Y = 80;
+			set_val(STICK_1_X, -100);
+			set_val(STICK_1_Y, 0);
+			set_val(STICK_2_X, 80);
+			set_val(STICK_2_Y, 80); 
+		} 
+		else if (get_val(ACCEL_2_X) <= 0.0 && get_val(ACCEL_2_Y) >= -100.0 && get_val(ACCEL_2_Y) < -60.0) { // P4+P5 as the game only has 4 accel notches
+			LAST_STICK_1_X = -100;
+			LAST_STICK_1_Y = 0;
+			LAST_STICK_2_X = 25;
+			LAST_STICK_2_Y = 100;
+			set_val(STICK_1_X, -100);
+			set_val(STICK_1_Y, 0);
+			set_val(STICK_2_X, 60); 
+			set_val(STICK_2_Y, 100);  
+		}
+		else if (get_val(ACCEL_2_X) <= 0.0 && get_val(ACCEL_2_Y) > 50.0) { // Acceleration intermediate
+			set_val(STICK_1_X, LAST_STICK_1_X);
+			set_val(STICK_1_Y, LAST_STICK_1_Y);
+			set_val(STICK_2_X, LAST_STICK_2_X);
+			set_val(STICK_2_Y, LAST_STICK_2_Y);
+		}
+	}
+
+}
