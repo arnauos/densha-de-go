@@ -1,4 +1,4 @@
-#pragma METAINFO("Journey to Kyoto Plug&Play PS4/5", 1, 10, "ZeusII")
+#pragma METAINFO("Journey to Kyoto Plug&Play PS4/5", 1, 01, "ZeusII")
 
 // Allows to control Japanese Rail Sim: Journey to Kyoto with your Densha de GO! Plug&Play Controller
 
@@ -14,7 +14,7 @@
 // - Ebrake: Off (not enough levers to use eBrake!)
 
 // Game Controls:
-// Press SELECT to enable (blue led) or disable the levers (red led), this is required in order to move through the menus
+// Press SELECT to enable (red led) or disable the levers (blue led), this is required in order to move through the menus
 // Horn pressing Square and Circle (electric horn)
 // Change view via Triangle
 // Pause as Options Button
@@ -22,6 +22,7 @@
 
 // changelist
 // 1.00 - first release
+// 1.01 - typo fixes
 
 #include <remapper.gph>
 
@@ -59,7 +60,7 @@ void LED(fix32 a, fix32 b, fix32 c, fix32 d)
 
 main {
 		
-	//Game Mode toggle - Square
+	//Game Mode toggle - Select
 	if (get_val(BUTTON_18) && !get_val(BUTTON_14) && !get_val(BUTTON_15) && !get_val(BUTTON_16)  && !get_val(BUTTON_17) ) {
 		set_val(BUTTON_18, 0);
 		if (GAME == FALSE) { 
@@ -105,7 +106,7 @@ main {
 	if(GAME == TRUE)
 	{
 				
-		//Normal Honk - Cross
+		//Normal Honk - Square
 		if (get_val(BUTTON_17)) {
 			set_val(BUTTON_17,0);
 			set_val(BUTTON_4, 100);
