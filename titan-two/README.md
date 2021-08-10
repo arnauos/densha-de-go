@@ -40,3 +40,16 @@ Supports P&P firmware 1.13 and requires the HID patch from GMMan: https://github
 * Other buttons: cross/confirm, circle/ehorn, triangle/view, square/horn
 
 
+
+KYO-ZKNS001.gpc
+---
+
+Allows using Zuiki ZKNS-001 Nintendo Switch controller as a controller on PS4/5 for playing Japanese Rail Sim: Journey to Kyoto.
+
+**How to use**
+* Connect Zuiki controller to Titan Two device lights on (Port A)
+* On the game settings, enable control scheme A, stick mode Release and enable or disable electricbrake at your own discretion
+* If you enabled electric brake, press one time (-) button to enable eBRAKE mode (Titan Two led will turn red). Then press (left)(down)(right)(Y)(X) to set the desired eBRAKE level from 1 to 5. Release the button to disconnect eBRAKE.
+
+
+
