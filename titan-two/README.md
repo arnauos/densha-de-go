@@ -13,6 +13,19 @@ The original script was modified to enable the use of the arrow keys. All credit
 * If using on PS5, remember to connect a third party USB controller on Port B to prevent recurrent disconnects every few minutes
 
 
+
+DDG-ZKNS001.gpc
+---
+
+Play Densha de GO!! on your PlayStation using Nintendo Switch Zuiki ZKNS-001 controller.
+
+**How to use**
+* Connect Zuiki controller to Titan Two device lights on (Port A)
+* On the game settings, enable advanced controls + analog pressure -non-step mode- otherwise, the levers will not work
+* If using on PS5, remember to connect a third party USB controller on Port B to prevent recurrent disconnects every few minutes
+
+
+
 KYO-PlugPlay-HID.gpc
 ---
 
