@@ -1,0 +1,123 @@
+#pragma METAINFO("Densha de GO!! with Zuiki ZKNS-001 PS4/5", 1, 10, "ZeusII")
+
+// based on the code by EddieLau https://github.com/tylau0/DenGo/blob/main/DenshaDeGoDGOC44UToPS4.gpc
+// inspired by HandsomeChan's script at https://mega.nz/file/XFl3SSRB#pi-fVi_JWkGES4ms9f6PI79RuMtKu1XP6obtWkCg4Ac
+// enhanced according to the controller outputs indicated in https://lihkg.com/thread/2320618/page/32
+// ported to Zuiki Switch controller by MikaelTarquin
+
+// On the game settings, enable advanced controls + analog pressure -non-step mode- otherwise, the levers will not work
+// If using on PS5, remember to connect a third party USB controller on Port B to prevent recurrent disconnects every few minutes
+
+// changelist
+// 1.00 - original port to ZKNS-001 by MikaelTarquin
+// 1.10 - added back support for series 103
+
+#include <remapper.gph>
+
+const uint8 DenshaDeGo[43] = {
+    RMP_USB_A,
+    BUTTON_1,  BUTTON_2,  BUTTON_3,  BUTTON_4,  BUTTON_5,  BUTTON_6,  BUTTON_7, 
+    BUTTON_8,  BUTTON_9,  BUTTON_10, BUTTON_11, BUTTON_12, BUTTON_13, BUTTON_14, 
+    BUTTON_15, BUTTON_16, BUTTON_17, BUTTON_18, BUTTON_19, BUTTON_20, BUTTON_21, 
+    STICK_1_X, STICK_1_Y, ACCEL_2_X, ACCEL_2_Y, 
+    POINT_1_X, POINT_1_Y, POINT_2_X, POINT_2_Y, 
+    ACCEL_1_X, ACCEL_1_Y, ACCEL_1_Z, STICK_2_X, STICK_2_Y, ACCEL_2_Z, 
+    GYRO_1_X,  GYRO_1_Y,  GYRO_1_Z,
+    PADDLE_1,  PADDLE_2,  PADDLE_3,  PADDLE_4
+};
+
+init {
+    remapper(DenshaDeGo);
+}
+
+void LED(fix32 a, fix32 b, fix32 c, fix32 d)
+{
+    led_set(LED_1, a, 0);
+    led_set(LED_2, b, 0);
+    led_set(LED_3, c, 0);
+    led_set(LED_4, d, 0);
+}
+
+main {
+	// Lightbar
+	LED(0.0, 0.0, 0.0, 5.0); // Blue
+	
+	// Throttle
+	if (get_val(ACCEL_2_Y) < -98.0) { // EB
+		set_val(STICK_2_Y, -100.0);
+        set_val(STICK_1_X, 100);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -98.0 && get_val(ACCEL_2_Y) < -90.0) { // B8
+		set_val(STICK_2_Y, -96.0);
+		set_val(STICK_2_X, -96.0);
+        set_val(STICK_1_X, 100);
+        set_val(STICK_2_X, 0);
+		
+	}
+	else if (get_val(ACCEL_2_Y) > -90.0 && get_val(ACCEL_2_Y) < -80.0) { // B7
+		set_val(STICK_2_Y, -85.0);
+        set_val(STICK_1_X, 90);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -80.0 && get_val(ACCEL_2_Y) < -70.0) { // B6
+		set_val(STICK_2_Y, -75.0);
+        set_val(STICK_1_X, 80);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -70.0 && get_val(ACCEL_2_Y) < -58.0) { // B5
+		set_val(STICK_2_Y, -70.0);
+        set_val(STICK_1_X, 70);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -58.0 && get_val(ACCEL_2_Y) < -48.0) { // B4
+		set_val(STICK_2_Y, -64.0);
+        set_val(STICK_1_X, 60);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -48.0 && get_val(ACCEL_2_Y) < -37.0) { // B3
+		set_val(STICK_2_Y, -53.0);
+        set_val(STICK_1_X, 50);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -37.0 && get_val(ACCEL_2_Y) < -26.0) { // B2
+		set_val(STICK_2_Y, -43.0);
+        set_val(STICK_1_X, 40);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -26.0 && get_val(ACCEL_2_Y) < -10.0) { // B1
+		set_val(STICK_2_Y, -32.0);
+        set_val(STICK_1_X, 30);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > -10.0 && get_val(ACCEL_2_Y) < 12.0) { // N
+		set_val(STICK_2_Y, 0.0);
+        set_val(STICK_1_X, 0);
+        set_val(STICK_2_X, 0);
+	}
+	else if (get_val(ACCEL_2_Y) > 12.0 && get_val(ACCEL_2_Y) < 35.0) { // P1
+		set_val(STICK_2_Y, 30.0);
+        set_val(STICK_1_X, 0);
+        set_val(STICK_2_X, -30); 
+	}
+	else if (get_val(ACCEL_2_Y) > 35.0 && get_val(ACCEL_2_Y) < 53.0) { // P2
+		set_val(STICK_2_Y, 44.0);
+        set_val(STICK_1_X, 0);
+        set_val(STICK_2_X, -50); 
+	}
+	else if (get_val(ACCEL_2_Y) > 53.0 && get_val(ACCEL_2_Y) < 70.0) { // P3
+		set_val(STICK_2_Y, 62.0);
+        set_val(STICK_1_X, 0);
+        set_val(STICK_2_X, -70);
+	}
+	else if (get_val(ACCEL_2_Y) > 70.0 && get_val(ACCEL_2_Y) < 90.0) { // P4
+		set_val(STICK_2_Y, 80.0);
+        set_val(STICK_1_X, 0);
+        set_val(STICK_2_X, -90); 
+	}
+	else if (get_val(ACCEL_2_Y) > 90.0) { // P5
+		set_val(STICK_2_Y, 100.0);
+        set_val(STICK_1_X, 0);
+        set_val(STICK_2_X, -100); 
+	}
+}
