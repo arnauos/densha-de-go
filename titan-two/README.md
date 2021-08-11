@@ -50,6 +50,7 @@ Allows using Zuiki ZKNS-001 Nintendo Switch controller as a controller on PS4/5 
 * Connect Zuiki controller to Titan Two device lights on (Port A)
 * On the game settings, enable control scheme A, stick mode Release and enable or disable electricbrake at your own discretion
 * If you enabled electric brake, press one time (-) button to enable eBRAKE mode (Titan Two led will turn red). Then press (left)(down)(right)(Y)(X) to set the desired eBRAKE level from 1 to 5. Release the button to disconnect eBRAKE.
+* When driving the Series 700, switch controls by pressing (ZL) while having the mascon in NEUTRAL
 
 
 
