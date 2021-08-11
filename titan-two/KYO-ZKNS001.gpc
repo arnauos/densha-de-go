@@ -10,7 +10,7 @@
 // - Electric brake: On (Optional)
 // - Stick mode: Release
 
-// Press (-) to enable Electric-Brake control at any time -> blue led on titan two
+// Press (-) to enable Electric-Brake control at any time -> red led on titan two
 // Keep pressing the following key depending on the level you want to apply:
 //		(left) eBrake1
 //		(down) eBrake2
