@@ -1,4 +1,4 @@
-#pragma METAINFO("Journey to Kyoto with Zuiki ZKNS-001 PS4/5", 1, 10, "ZeusII")
+#pragma METAINFO("Journey to Kyoto with Zuiki ZKNS-001 PS4/5", 1, 30, "ZeusII")
 
 // Allows to control Japanese Rail Sim: Journey to Kyoto with your Zuiki ZKNS-001 controller
 
@@ -10,7 +10,7 @@
 // - Electric brake: On (Optional)
 // - Stick mode: Release
 
-// Press (-) to enable Electric-Brake control at any time -> red led on titan two
+// Press (-) to enable Electric-Brake control at any time -> blue led on titan two
 // Keep pressing the following key depending on the level you want to apply:
 //		(left) eBrake1
 //		(down) eBrake2
@@ -18,11 +18,17 @@
 //		(Y)	eBrake4
 //		(X) eBrake5
 
+// Press (ZL) when in NEUTRAL to toggle between the default Series 900 control scheme and the Series 700 control scheme
+// Stick positions are different so this is required for correct operation. Series 700 is unlocked on full line mode.
+
 // changelist
 // 1.00 - adapted from original Plug&play script
 // 1.10 - added Electric Brake control
+// 1.20 - added Series 700 control since the stick distribution is different, toggle pressing ZL when on NEUTRAL
+// 1.30 - enabled the use of conventional brakes + electric brakes for maximum braking power
 
 #include <remapper.gph>
+#include <display.gph>
 
 const uint8 DenshaDeGo[43] = {
     RMP_USB_A,
@@ -37,6 +43,8 @@ const uint8 DenshaDeGo[43] = {
 };
 
 bool EBRAKE = FALSE;
+bool S700 = FALSE;
+int8 S700STICK = 0;
 
 init {
     remapper(DenshaDeGo);
@@ -53,6 +61,7 @@ void LED(fix32 a, fix32 b, fix32 c, fix32 d)
 main {
 	
 	//eBRAKE Mode toggle - (-)
+	set_val(BUTTON_2, 0);
 	if (event_active(BUTTON_2)) {
 		set_val(BUTTON_2, 0);
 		if (EBRAKE == FALSE) { 
@@ -66,60 +75,143 @@ main {
 			LED(0.0, 0.0, 0.0, 5.0); // Blue
 		}
 	}
+	
+	//700 SERIES Mode toggle - (ZL) when on NEUTRAL
+	set_val(BUTTON_8, 0);
+	if (event_active(BUTTON_8) && (get_val(ACCEL_2_Y) > -10.0 && get_val(ACCEL_2_Y) < 12.0)) {
+		set_val(BUTTON_8, 0);
+		if ((S700 == FALSE)) { 
+			//Enter 700 SERIES Mode
+			S700 = TRUE;
+			display_overlay(_7_|BOTTOM_DOT,2000000);
+		}
+		else {
+			//Exit eBrake Mode
+			S700 = FALSE;
+			display_overlay(_9_|BOTTOM_DOT,2000000);
+		}
+	}
 
-	// Throttle
+	// Master controller
 	if (get_val(ACCEL_2_Y) < -98.0) { // EB
-		set_val(STICK_1_X, 100);
-		set_val(STICK_1_Y, -30);
+		if (S700 == TRUE)
+		{
+			set_val(STICK_1_X, 100);
+			set_val(STICK_1_Y, -50);
+		}
+		else
+		{
+			set_val(STICK_1_X, 100);
+			set_val(STICK_1_Y, -30);
+		}
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
 		set_val(BUTTON_8, 0);
 	}
-	else if (get_val(ACCEL_2_Y) > -98.0 && get_val(ACCEL_2_Y) < -90.0) { // B8
-		set_val(STICK_1_X, 100);
-		set_val(STICK_1_Y, 50);
-		set_val(STICK_2_X, 0);
-		set_val(STICK_2_Y, 0);
-	}
-	else if (get_val(ACCEL_2_Y) > -90.0 && get_val(ACCEL_2_Y) < -80.0) { // B7
-		set_val(STICK_1_X, 100);
-		set_val(STICK_1_Y, 50);
-		set_val(STICK_2_X, 0);
+	else if (get_val(ACCEL_2_Y) > -98.0 && get_val(ACCEL_2_Y) < -80.0) { // B7+B8, no B8 in game
+		if (S700 == TRUE)
+		{
+			set_val(STICK_1_X, 100);
+			set_val(STICK_1_Y, 21);
+		}
+		else
+		{
+			set_val(STICK_1_X, 100);
+			set_val(STICK_1_Y, 50);
+		}
+		set_val(STICK_2_X, 0);		
 		set_val(STICK_2_Y, 0);
 	}
 	else if (get_val(ACCEL_2_Y) > -80.0 && get_val(ACCEL_2_Y) < -70.0) { // B6
-		set_val(STICK_1_X, 60);
-		set_val(STICK_1_Y, 90);
+		if (S700 == TRUE)
+		{
+			set_val(STICK_1_X, 100);
+			set_val(STICK_1_Y, 44);
+		}
+		else
+		{
+			set_val(STICK_1_X, 60);
+			set_val(STICK_1_Y, 90);
+		}
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
 	}
 	else if (get_val(ACCEL_2_Y) > -70.0 && get_val(ACCEL_2_Y) < -58.0) { // B5
-		set_val(STICK_1_X, 20);
-		set_val(STICK_1_Y, 100);
+		if (S700 == TRUE)
+		{
+			set_val(STICK_1_X, 92);
+			set_val(STICK_1_Y, 64);
+		}
+		else
+		{	
+			set_val(STICK_1_X, 20);
+			set_val(STICK_1_Y, 100);
+		}
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
 	}
 	else if (get_val(ACCEL_2_Y) > -58.0 && get_val(ACCEL_2_Y) < -48.0) { // B4
-		set_val(STICK_1_X, -40);
-		set_val(STICK_1_Y, 100);
+		if (S700 == TRUE)
+		{
+			set_val(STICK_1_X, 73);
+			set_val(STICK_1_Y, 84);
+		}
+		else
+		{
+			set_val(STICK_1_X, -40);
+			set_val(STICK_1_Y, 100);
+		}
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
 	}
 	else if (get_val(ACCEL_2_Y) > -48.0 && get_val(ACCEL_2_Y) < -37.0) { // B3
-		set_val(STICK_1_X, -70);
-		set_val(STICK_1_Y, 85);
+		if (S700 == TRUE)
+		{
+			set_val(STICK_1_X, 70);
+			set_val(STICK_1_Y, 90);
+		}
+		else
+		{
+			set_val(STICK_1_X, -70);
+			set_val(STICK_1_Y, 85);
+		}
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
 	}
 	else if (get_val(ACCEL_2_Y) > -37.0 && get_val(ACCEL_2_Y) < -26.0) { // B2
-		set_val(STICK_1_X, -90);
-		set_val(STICK_1_Y, 65);
+		if (S700 == TRUE)
+		{
+			set_val(STICK_1_X, 45);
+			set_val(STICK_1_Y, 100);
+		}
+		else
+		{
+			set_val(STICK_1_X, -90);
+			set_val(STICK_1_Y, 65);
+		}
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
+		S700STICK = 1;
 	}
 	else if (get_val(ACCEL_2_Y) > -26.0 && get_val(ACCEL_2_Y) < -10.0) { // B1
-		set_val(STICK_1_X, -100);
-		set_val(STICK_1_Y, 45);
+		if (S700 == TRUE)
+		{
+			if(S700STICK == 0)
+			{
+				set_val(STICK_1_X, 15);
+				set_val(STICK_1_Y, 100);
+			}
+			else
+			{
+				set_val(STICK_1_X, 20);
+				set_val(STICK_1_Y, 100);
+			}
+		}
+		else
+		{
+			set_val(STICK_1_X, -100);
+			set_val(STICK_1_Y, 45);
+		}
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
 	}
@@ -128,6 +220,7 @@ main {
 		set_val(STICK_1_Y, 0);
 		set_val(STICK_2_X, 0);
 		set_val(STICK_2_Y, 0);
+		S700STICK = 0;
 	}
 	else if (get_val(ACCEL_2_Y) > 12.0 && get_val(ACCEL_2_Y) < 35.0) { // P1
 		set_val(STICK_1_X, -100);
@@ -137,7 +230,7 @@ main {
 	}
 	else if (get_val(ACCEL_2_Y) > 35.0 && get_val(ACCEL_2_Y) < 53.0) { // P2
 		set_val(STICK_1_X, -100);
-		set_val(STICK_1_Y, 0);
+		set_val(STICK_1_Y, 0); 
 		set_val(STICK_2_X, 100); 
 		set_val(STICK_2_Y, 30);
 	}
@@ -166,40 +259,40 @@ main {
 		if(get_val(BUTTON_12))	//LEFT EBRAKE1
 		{
 			set_val(BUTTON_12, 0);
-			set_val(STICK_1_X, 0);
-			set_val(STICK_1_Y, 0);
+			//set_val(STICK_1_X, 0);
+			//set_val(STICK_1_Y, 0);
 			set_val(STICK_2_X, 12.94); 
 			set_val(STICK_2_Y, -100); 
 		}
 		else if(get_val(BUTTON_11)) //LEFT EBRAKE2
 		{
 			set_val(BUTTON_11, 0);
-			set_val(STICK_1_X, 0);
-			set_val(STICK_1_Y, 0);
+			//set_val(STICK_1_X, 0);
+			//set_val(STICK_1_Y, 0);
 			set_val(STICK_2_X, -45.10); 
 			set_val(STICK_2_Y, -100); 
 		}
 		else if(get_val(BUTTON_13)) //RIGHT EBRAKE3
 		{
 			set_val(BUTTON_13, 0);
-			set_val(STICK_1_X, 0);
-			set_val(STICK_1_Y, 0);
+			//set_val(STICK_1_X, 0);
+			//set_val(STICK_1_Y, 0);
 			set_val(STICK_2_X, -74.9); 
 			set_val(STICK_2_Y, -83.31); 
 		}
 		else if(get_val(BUTTON_17)) //Y EBRAKE4
 		{
 			set_val(BUTTON_17, 0);
-			set_val(STICK_1_X, 0);
-			set_val(STICK_1_Y, 0);
+			//set_val(STICK_1_X, 0);
+			//set_val(STICK_1_Y, 0);
 			set_val(STICK_2_X, -93.73); 
 			set_val(STICK_2_Y, -56.86); 
 		}
 		else if(get_val(BUTTON_14)) //X EBRAKE5
 		{
-			set_val(BUTTON_16, 0);
-			set_val(STICK_1_X, 0);
-			set_val(STICK_1_Y, 0);
+			set_val(BUTTON_14, 0);
+			//set_val(STICK_1_X, 0);
+			//set_val(STICK_1_Y, 0);
 			set_val(STICK_2_X, -100); 
 			set_val(STICK_2_Y, -13); 
 		}
